@@ -1,4 +1,4 @@
-import mangoose from "mongoose";
+import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
@@ -12,10 +12,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
       index: true, //Enable searching for this field in DB
     },
-    watchHistory: {
-      type: mangoose.Schema.Types.ObjectId,
-      ref: "Videos",
-    },
+    watchHistory: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Videos",
+      },
+    ],
     email: {
       type: String,
       required: [true, "email is required"],
@@ -50,11 +52,11 @@ const userSchema = new mongoose.Schema(
 // pre hook/middleware to encrypt the password before saving to database
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
-// Inject custom method to userSchema collection
+// Inject custom method to user Schema collection
 userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };

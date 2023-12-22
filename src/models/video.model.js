@@ -1,6 +1,6 @@
-import mangoose from "mangoose";
-import mangooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
-const videoSchema = new mangoose.Schema(
+import mongoose from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
+const videoSchema = new mongoose.Schema(
   {
     videoFile: {
       type: String, //cloudinary url
@@ -11,7 +11,7 @@ const videoSchema = new mangoose.Schema(
       required: true,
     },
     owner: {
-      type: mangoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Owner",
       required: true,
     },
@@ -39,4 +39,4 @@ const videoSchema = new mangoose.Schema(
   { timestamps: true }
 );
 
-export const Video = mangoose.model("Video", videoSchema);
+export const Video = mongoose.model("Video", videoSchema);
