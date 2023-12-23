@@ -19,9 +19,17 @@ const registerUser = asyncHandler(async (req, res) => {
   const { fullname, username, email, password } = req.body;
 
   if (
-    [fullname, email, username, password].some((entry) => entry.trim() === "")
+    [fullname, email, username, password].some(
+      (entry) => entry?.trim() === "" || entry?.trim() === undefined
+    )
   ) {
     throw new ApiError(400, "All fields are required");
+  }
+
+  const alphaRegex = /^[a-zA-Z\s]+$/;
+
+  if (!alphaRegex.test(fullname)) {
+    throw new ApiError(400, "fullname is not valid");
   }
 
   const validationSchema = z.object({
@@ -47,18 +55,16 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "user with email or username already exists");
   }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
-
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  console.log("hhh ", req.files?.coverImage?.[0]?.path);
+  const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
+  console.log("sadhk", coverImageLocalPath);
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required");
   }
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
-  let coverImage = "";
-  if (coverImageLocalPath) {
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
-  }
+  const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
   if (!avatar) {
     throw new ApiError(400, "Avatar file is not supported");
@@ -67,7 +73,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const user = await User.create({
     fullname,
     avatar: avatar.url,
-    coverImage: coverImage,
+    coverImage: coverImage?.url || "",
     username: username.toLowerCase(),
     email,
     password,
@@ -85,7 +91,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   return res
     .status(201)
-    .json(new ApiResponse(200, createdUser, "User registered successfully"));
+    .json(new ApiResponse(201, createdUser, "User registered successfully"));
 });
 
 export { registerUser };
