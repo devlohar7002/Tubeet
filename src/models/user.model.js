@@ -76,7 +76,7 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-userSchema.methods.refereshAccessToken = function () {
+userSchema.methods.generateRefereshAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,

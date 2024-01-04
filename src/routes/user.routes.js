@@ -1,6 +1,12 @@
 import express from "express";
-import { registerUser } from "../controllers/user.controller.js";
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+  refreshAccessToken,
+} from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -17,5 +23,11 @@ router.route("/register").post(
   ]),
   registerUser
 );
+
+router.route("/login").post(loginUser);
+
+//secured route
+router.route("/logout").post(verifyJWT, logoutUser);
+router.route("refresh-token").post(refreshAccessToken);
 
 export { router };
